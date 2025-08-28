@@ -5,18 +5,10 @@ import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
-
-
 import java.time.Duration;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RegistrationAndAutorizationTest extends TestData {
-    String homeUrl = "http://shop.bugred.ru/";
-    String homePageTextPath = "/html/body/div/div/div[1]/div/p[1]";
-    String signUpButtonXPath = "//*[@id=\"navbarSupportedContent\"]/ul/li[3]/a";
-    String logInButtonXPath= "/html/body/nav/div/ul/li[4]/a";
-    String authorisedUserName = "//*[@id=\"navbarDropdown2\"]";
-    String logOutButton = "//*[@id=\"navbarSupportedContent\"]/ul/li[3]/div/a[3]";
 
     @Test
     @Order(1)
@@ -24,10 +16,10 @@ public class RegistrationAndAutorizationTest extends TestData {
     @Feature("Main Page")
     @DisplayName("Перейти на главную страницу и проверить, что страница загрузилась")
     public void OpenHomePageTest() {
-        TestData.getDriver().get(homeUrl);
+        TestData.getDriver().get(HomePage.homeUrl);
         TestData.getDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10L));
-        System.out.println(TestData.getDriver().findElement(By.xpath(homePageTextPath)).getText());
-        assert TestData.getDriver().findElement(By.xpath(homePageTextPath)).getText().equals("Это ТЕСТОВЫЙ магазин! Осторожно, тут могут быть баги :) ");
+        System.out.println(TestData.getDriver().findElement(By.xpath(HomePage.homePageTextPath)).getText());
+        assert TestData.getDriver().findElement(By.xpath(HomePage.homePageTextPath)).getText().equals("Это ТЕСТОВЫЙ магазин! Осторожно, тут могут быть баги :) ");
     }
 
     @Test
@@ -37,7 +29,7 @@ public class RegistrationAndAutorizationTest extends TestData {
     @DisplayName("Регистрация позитивный тест")
     public void GoToRegisterPageTest() {
         TestData.getDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5L));
-        TestData.getDriver().findElement(By.xpath(signUpButtonXPath)).click();
+        TestData.getDriver().findElement(By.xpath(HomePage.signUpButtonXPath)).click();
         System.out.println(TestData.getDriver().findElement(By.xpath(SignUpPage.registerHeaderTextPath)).getText());
         assert TestData.getDriver().findElement(By.xpath(SignUpPage.registerHeaderTextPath)).getText().equals("""
             Главная
@@ -57,8 +49,8 @@ public class RegistrationAndAutorizationTest extends TestData {
     @Feature("Autorization")
     @DisplayName("Авторизация позитивный тест")
     public void RegisterPositiveTest() throws InterruptedException {
-        TestData.getDriver().get(homeUrl);
-        TestData.getDriver().findElement(By.xpath(logInButtonXPath)).click();
+        TestData.getDriver().get(HomePage.homeUrl);
+        TestData.getDriver().findElement(By.xpath(HomePage.logInButtonXPath)).click();
         System.out.println(TestData.getDriver().findElement(By.xpath(SignUpPage.registerHeaderTextPath)).getText());
         assert TestData.getDriver().findElement(By.xpath(SignUpPage.registerHeaderTextPath)).getText().equals("""
             Главная
@@ -70,8 +62,8 @@ public class RegistrationAndAutorizationTest extends TestData {
         TestData.getDriver().findElement(By.xpath(LoginPage.buttonLoginPath)).click();
         TestData.getDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5L));
 
-        System.out.println(TestData.getDriver().findElement(By.xpath(authorisedUserName)).getText());
-        assert TestData.getDriver().findElement(By.xpath(authorisedUserName)).getText().equals(TestData.getUserName());
+        System.out.println(TestData.getDriver().findElement(By.xpath(HomePage.authorisedUserName)).getText());
+        assert TestData.getDriver().findElement(By.xpath(HomePage.authorisedUserName)).getText().equals(TestData.getUserName());
 
     }
 
@@ -82,8 +74,8 @@ public class RegistrationAndAutorizationTest extends TestData {
     @DisplayName("Выход из аккаунта позитивный тест")
     public void QuitPositiveTest() throws InterruptedException {
 
-        TestData.getDriver().findElement(By.xpath(authorisedUserName)).click();
-        TestData.getDriver().findElement(By.xpath(logOutButton)).click();
+        TestData.getDriver().findElement(By.xpath(HomePage.authorisedUserName)).click();
+        TestData.getDriver().findElement(By.xpath(HomePage.logOutButton)).click();
         assert TestData.getDriver().findElement(By.xpath(SignUpPage.buttonSignInPath)).isDisplayed();
     }
 }
