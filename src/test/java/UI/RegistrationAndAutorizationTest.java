@@ -64,10 +64,8 @@ public class RegistrationAndAutorizationTest extends DriverDecorating {
 
         getDriver().findElement(By.xpath(LoginPage.LOGIN_FIELD_X_PATH)).sendKeys(EMAIL);
         getDriver().findElement(By.xpath(LoginPage.ENTER_PASSWORD_FIELD_X_PATH)).sendKeys(PASSWORD);
-
         getDriver().findElement(By.xpath(LoginPage.BUTTON_LOGIN_PATH)).click();
         getDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10L));
-
         System.out.println(DriverDecorating.getDriver().findElement(By.xpath(HomePage.AUTHORISED_USER_NAME)).getText());
         assert DriverDecorating.getDriver().findElement(By.xpath(HomePage.AUTHORISED_USER_NAME)).getText().equals(USER_NAME);
 

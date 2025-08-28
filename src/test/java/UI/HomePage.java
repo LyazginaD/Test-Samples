@@ -1,6 +1,7 @@
 package UI;
 
 public class HomePage {
+
     public final static String HOME_URL = "http://shop.bugred.ru/";
     public final static String HOME_PAGE_TEXT_PATH = "/html/body/div/div/div[1]/div/p[1]";
     public final static String SIGN_UP_BUTTON_X_PATH = "//*[@id=\"navbarSupportedContent\"]/ul/li[3]/a";

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeAll;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
-
 public class DriverDecorating implements WebDriverListener {
 
     public static WebDriver decoratedDriver;
