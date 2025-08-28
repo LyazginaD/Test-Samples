@@ -48,7 +48,7 @@ public class RegistrationAndAutorizationTest extends TestData {
     @Severity(SeverityLevel.CRITICAL)
     @Feature("Autorization")
     @DisplayName("Авторизация позитивный тест")
-    public void RegisterPositiveTest() throws InterruptedException {
+    public void RegisterPositiveTest(){
         TestData.getDriver().get(HomePage.homeUrl);
         TestData.getDriver().findElement(By.xpath(HomePage.logInButtonXPath)).click();
         System.out.println(TestData.getDriver().findElement(By.xpath(SignUpPage.registerHeaderTextPath)).getText());
@@ -72,7 +72,7 @@ public class RegistrationAndAutorizationTest extends TestData {
     @Severity(SeverityLevel.CRITICAL)
     @Feature("Autorization")
     @DisplayName("Выход из аккаунта позитивный тест")
-    public void QuitPositiveTest() throws InterruptedException {
+    public void QuitPositiveTest() {
 
         TestData.getDriver().findElement(By.xpath(HomePage.authorisedUserName)).click();
         TestData.getDriver().findElement(By.xpath(HomePage.logOutButton)).click();
