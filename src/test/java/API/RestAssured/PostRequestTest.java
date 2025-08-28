@@ -1,4 +1,4 @@
-package API;
+package API.RestAssured;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
@@ -10,23 +10,19 @@ import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Feature;
 
 public class PostRequestTest {
-    private static final String API_KEY = "reqres-free-v1";
-    private static final String USERS_ENDPOINT = "/api/users";
-    private static final String NAME = "morpheus";
-    private static final String JOB = "leader";
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
     @Feature("API")
     @DisplayName("Тестирование тестового запроса Post с проверкой status code = 201")
     public void postRequestCheckStatusCode() {
-        UserDTO user = new UserDTO(NAME, JOB);
+        UserDTO user = new UserDTO(TestData.NAME, TestData.INITIAL_JOB);
 
         RestAssured.given()
-                .header("x-api-key", API_KEY)
+                .header("x-api-key", TestData.API_KEY)
                 .spec(Specifications.requestSpecification())
                 .body(user)
-                .post(USERS_ENDPOINT)
+                .post(TestData.USERS_ENDPOINT)
                 .then()
                 .statusCode(201);
     }
@@ -36,18 +32,18 @@ public class PostRequestTest {
     @Feature("API")
     @DisplayName("Тестирование тестового запроса Post c проверкой key/value по полям name, job")
     public void postRequestCheckResponseJsonBody() {
-        UserDTO user = new UserDTO(NAME, JOB);
+        UserDTO user = new UserDTO(TestData.NAME, TestData.INITIAL_JOB);
 
         ValidatableResponse response = RestAssured.given()
-                .header("x-api-key", API_KEY)
+                .header("x-api-key", TestData.API_KEY)
                 .spec(Specifications.requestSpecification())
                 .body(user)
-                .post(USERS_ENDPOINT)
+                .post(TestData.USERS_ENDPOINT)
                 .then()
                 .statusCode(201);
 
         response.assertThat()
-                .body("name", Matchers.equalTo(NAME))
-                .body("job", Matchers.equalTo(JOB));
+                .body("name", Matchers.equalTo(TestData.NAME))
+                .body("job", Matchers.equalTo(TestData.INITIAL_JOB));
     }
 }

@@ -1,4 +1,4 @@
-package API;
+package API.RestAssured;
 
 import io.restassured.RestAssured;
 import io.restassured.module.jsv.JsonSchemaValidator;
@@ -11,9 +11,6 @@ import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Feature;
 
 public class GetRequestTest {
-    private static final String API_KEY = "reqres-free-v1";
-    private static final String USER_ENDPOINT = "/api/users/2";
-    private static final String SCHEMA_PATH = "schemaUsersById.json";
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
@@ -21,9 +18,9 @@ public class GetRequestTest {
     @DisplayName("Тестирование запроса Get c проверкой status code = 200")
     public void getRequestCheckStatusCode() {
         RestAssured.given()
-                .header("x-api-key", API_KEY)
+                .header("x-api-key", TestData.API_KEY)
                 .spec(Specifications.requestSpecification())
-                .get(USER_ENDPOINT)
+                .get(TestData.USERS_ENDPOINT)
                 .then()
                 .statusCode(200);
     }
@@ -34,9 +31,9 @@ public class GetRequestTest {
     @DisplayName("Тестирование запроса Get c проверкой key/value по полям id, email, first_name, last_name")
     public void getRequestCheckResponseJsonBody() {
         ValidatableResponse response = RestAssured.given()
-                .header("x-api-key", API_KEY)
+                .header("x-api-key", TestData.API_KEY)
                 .spec(Specifications.requestSpecification())
-                .get(USER_ENDPOINT)
+                .get(TestData.USERS_ENDPOINT + "/2")
                 .then()
                 .statusCode(200);
 
@@ -53,13 +50,13 @@ public class GetRequestTest {
     @DisplayName("Тестирование запроса Get c валидацией ответа по json схеме")
     public void getRequestCheckResponseWithJsonSchema() {
         RestAssured.given()
-                .header("x-api-key", API_KEY)
+                .header("x-api-key", TestData.API_KEY)
                 .spec(Specifications.requestSpecification())
-                .get(USER_ENDPOINT)
+                .get(TestData.USERS_ENDPOINT+ "/2")
                 .then()
                 .spec(Specifications.responseSpecificationScOk())
                 .assertThat()
-                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/schemaUsersById.json"));
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath(TestData.SCHEMA_PATH));
     }
 }
 

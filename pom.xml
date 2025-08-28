@@ -122,6 +122,11 @@
             <version>5.6.2</version> <!-- Замените на актуальную версию JMeter -->
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version> <!-- Актуальная версия на момент написания -->
+        </dependency>
     </dependencies>
     <build>
         <plugins>

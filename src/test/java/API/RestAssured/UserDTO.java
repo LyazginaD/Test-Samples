@@ -1,4 +1,4 @@
-package API;
+package API.RestAssured;
 
 public class UserDTO {
     public String name;

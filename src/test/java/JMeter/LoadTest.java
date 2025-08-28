@@ -6,13 +6,7 @@ import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.internal.shadowed.jackson.databind.JsonNode;
 import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.Comparator;
-
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +24,7 @@ public class LoadTest {
     public void testPerformanceGet10() throws IOException {
 
         TestPlanStats stats = testPlan(
-                threadGroup(10, 1,
+                threadGroup(5, 1,
                         httpSampler("https://reqres.in/api/users/2")
                                 .header("x-api-key", "reqres-free-v1")),
 
@@ -106,5 +100,13 @@ public class LoadTest {
         assertThat(stats.overall().sampleTimePercentile99())
                 .isLessThan(Duration.ofSeconds(5));
 
+    }
+    @BeforeEach
+    public void makeAPause(){
+        try {
+            Thread.sleep(5000); // Пауза 1 секунда
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

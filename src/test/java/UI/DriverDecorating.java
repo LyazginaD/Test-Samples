@@ -12,53 +12,20 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 
-public class TestData implements WebDriverListener {
+public class DriverDecorating implements WebDriverListener {
 
-    private static String userName;
-    private static String password;
-    public static String email;
-    private static WebDriver decoratedDriver;
-
-    public static void setUserName() {
-        userName = "UserName117";
-    }
-
-    public static void setEmail() {
-        email = "aaa117@aaa.com";
-    }
-
-    public static void setPassword() {
-        password = "Password1!";
-    }
-
-    public static String getUserName() {
-        return userName;
-    }
-
-    public static String getEmail() {
-        return email;
-    }
-
-    public static String getPassword() {
-        return password;
-    }
-
+    public static WebDriver decoratedDriver;
 
     @BeforeAll
     public static void setUp() {
-        setUserName();
-        setEmail();
-        setPassword();
 
         // Инициализация ChromeOptions
         ChromeOptions options = new ChromeOptions();
-        // Добавление расширения (убедитесь, что путь правильный)
-//        options.addExtensions(new File("E:/Prog/..."));
 
         // WebDriver компоненты
         WebDriver originalDriver = new ChromeDriver(options);
-        TestData testDataListener = new TestData();
-        EventFiringDecorator<@NotNull WebDriver> decorator = new EventFiringDecorator<>(testDataListener);
+        DriverDecorating driverDecoratingListener = new DriverDecorating();
+        EventFiringDecorator<@NotNull WebDriver> decorator = new EventFiringDecorator<>(driverDecoratingListener);
         decoratedDriver = decorator.decorate(originalDriver);
         // Получаем размер экрана
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
