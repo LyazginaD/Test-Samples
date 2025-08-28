@@ -1,6 +1,7 @@
 package API.RestAssured;
 
 public class TestData {
+
     public static final String API_KEY = "reqres-free-v1";
     public static final String USERS_ENDPOINT = "/api/users";
     public static final String NAME = "morpheus";

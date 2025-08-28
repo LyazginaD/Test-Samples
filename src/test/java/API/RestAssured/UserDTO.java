@@ -1,6 +1,7 @@
 package API.RestAssured;
 
 public class UserDTO {
+
     public String name;
     public String job;
 

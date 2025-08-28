@@ -31,4 +31,5 @@ public class Specifications {
                 .expectResponseTime(Matchers.lessThanOrEqualTo(MAX_RESPONSE_TIME_SECONDS), TimeUnit.SECONDS)
                 .build();
     }
+
 }

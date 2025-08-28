@@ -45,4 +45,5 @@ public class PutRequestTest {
                 .body("name", Matchers.equalTo(TestData.NAME))
                 .body("job", Matchers.equalTo(TestData.UPDATED_JOB));
     }
+
 }

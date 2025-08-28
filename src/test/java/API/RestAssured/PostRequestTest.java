@@ -46,4 +46,5 @@ public class PostRequestTest {
                 .body("name", Matchers.equalTo(TestData.NAME))
                 .body("job", Matchers.equalTo(TestData.INITIAL_JOB));
     }
+
 }

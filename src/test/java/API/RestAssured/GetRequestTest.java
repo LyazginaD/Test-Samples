@@ -58,5 +58,6 @@ public class GetRequestTest {
                 .assertThat()
                 .body(JsonSchemaValidator.matchesJsonSchemaInClasspath(TestData.SCHEMA_PATH));
     }
+
 }
 
