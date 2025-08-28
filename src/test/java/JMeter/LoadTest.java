@@ -101,6 +101,7 @@ public class LoadTest {
                 .isLessThan(Duration.ofSeconds(5));
 
     }
+
     @BeforeEach
     public void makeAPause(){
         try {
@@ -109,4 +110,5 @@ public class LoadTest {
             throw new RuntimeException(e);
         }
     }
+
 }
