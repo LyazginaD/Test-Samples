@@ -3,88 +3,119 @@ package API.SQL;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SQLTest {
 
-    private static final String SUPABASE_URL = "https://vsopzyezklzzkkvkxgav.supabase.co/rest/v1";
-    private static final String API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzb3B6eWV6a2x6emtrdmt4Z2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzNjgxMTEsImV4cCI6MjA3MTk0NDExMX0.Kfn0KzpsZ_7BCmFBo7xAxas7zs6CGwMY3nNhB7pzFcM";
+    private final SQLExecutor sqlExecutor = new SQLExecutor();
 
-    private final HttpClient httpClient = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_2)
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
-
-    public static void main(String[] args) {
-        SQLTest test = new SQLTest();
+    @Test
+    @Severity(SeverityLevel.CRITICAL)
+    @Feature("DataBase")
+    @DisplayName("Вывод данных по пользователям с максимальной скидкой")
+    public void testSqlDiscount() {
         try {
-            test.testSqlFunction();
+            String query = "SELECT id, created_at, email, discount FROM users WHERE discount = (Select MAX(discount) FROM users GROUP BY discount LIMIT 1) ORDER BY created_at DESC";
+
+            System.out.println("SQL: " + query);
+
+            HttpResponse<String> response = sqlExecutor.executeSqlRequest(query);
+            sqlExecutor.printResponse(response);
+
+            // Проверка успешного статуса
+            assertTrue(response.statusCode() >= 200 && response.statusCode() < 300,
+                    "HTTP статус должен быть успешным");
+
         } catch (Exception e) {
-            System.err.println("Ошибка: " + e.getMessage());
+            System.err.println("Ошибка при выполнении SQL запроса: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Тест не прошел", e);
         }
     }
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
     @Feature("DataBase")
-    public void testSqlFunction() {
+    @DisplayName("Вывод данных по эффективности акций для продуктов с истекающими сроками годности")
+    public void testSqlSalesEfficiency() {
         try {
-            String query = "SELECT id, created_at, email FROM users WHERE discount > 0 ORDER BY created_at DESC LIMIT 3";
-            String sqlBody = String.format("{\"query_text\": \"%s\"}", query);
+            String query = "SELECT sale_id, " +
+                    "products.name, " +
+                    "sales.discount, " +
+                    "stock_balance, " +
+                    "SUM(quantity) AS quantity_sold, " +
+                    "beginning_date, " +
+                    "end_date " +
+                    "FROM products JOIN sales ON products.product_id = sales.product_id " +
+                            "JOIN purchases ON products.product_id = purchases.product_id " +
+                    "WHERE expires_at > beginning_date " +
+                        "AND expires_at <= end_date + INTERVAL '1 day' " +
+                        "AND stock_balance<20 " +
+                    "GROUP BY quantity, sale_id, products.name, sales.discount, stock_balance, expires_at " +
+                    "ORDER BY quantity DESC";
 
             System.out.println("SQL: " + query);
 
-            HttpResponse<String> response = executeSqlRequest(sqlBody);
-            printResponse(response);
+            HttpResponse<String> response = sqlExecutor.executeSqlRequest(query);
+            sqlExecutor.printResponse(response);
+
+            // Проверка успешного статуса
+            assertTrue(response.statusCode() >= 200 && response.statusCode() < 300,
+                    "HTTP статус должен быть успешным");
 
         } catch (Exception e) {
             System.err.println("Ошибка при выполнении SQL запроса: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Тест не прошел", e);
         }
     }
 
-    private HttpResponse<String> executeSqlRequest(String body) throws Exception {
-        String url = SUPABASE_URL + "/rpc/exec_sql";
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("apikey", API_KEY)
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + API_KEY)
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-
-        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-    }
-
-    private void printResponse(HttpResponse<String> response) {
-        System.out.println("Status: " + response.statusCode());
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            System.out.println("✅ Успех! Данные:");
-            System.out.println(formatJson(response.body()));
-        } else {
-            System.out.println("❌ Ошибка! Ответ:");
-            System.out.println(response.body());
-        }
-        System.out.println("\n" + "─".repeat(70) + "\n");
-    }
-
-    private String formatJson(String json) {
+    @Test
+    @Severity(SeverityLevel.CRITICAL)
+    @Feature("DataBase")
+    @DisplayName("Вывод анализа покупок за последние 30 дней")
+    public void testSqlUserPurchaseAnalysis() {
         try {
-            return json.replace("},{", "},\n{")
-                    .replace("[{", "[\n{")
-                    .replace("}]", "}\n]")
-                    .replace("}, {", "},\n{");
+            String query = "SELECT " +
+                    "users.email, " +
+                    "users.discount, " +
+                    "products.name, " +
+                    "products.price, " +
+                    "sales.sale_id, " +
+                    "sales.discount, " +
+                    "purchases.id, " +
+                    "purchases.date, " +
+                    "purchases.quantity, " +
+                    "purchases.price, " +
+                    "purchases.discount as total_discount, " +
+                    "SUM(purchases.quantity) OVER (PARTITION BY users.id) as total_user_purchases, " +
+                    "SUM(purchases.quantity * purchases.price) OVER (PARTITION BY users.id) as total_user_spent, " +
+                    "AVG(purchases.quantity) OVER (PARTITION BY products.product_id) as avg_quantity_per_product " +
+                    "FROM users " +
+                    "INNER JOIN purchases ON users.id = purchases.buyer " +
+                    "INNER JOIN products ON purchases.product_id = products.product_id " +
+                    "LEFT JOIN sales ON products.product_id = sales.product_id " +
+                    "WHERE purchases.date >= CURRENT_DATE - INTERVAL '30 days' " +
+                    "ORDER BY total_user_spent DESC, users.id, purchases.date DESC";
+
+
+            System.out.println("SQL: " + query);
+
+            HttpResponse<String> response = sqlExecutor.executeSqlRequest(query);
+            sqlExecutor.printResponse(response);
+
+            // Проверка успешного статуса
+            assertTrue(response.statusCode() >= 200 && response.statusCode() < 300,
+                    "HTTP статус должен быть успешным");
+
         } catch (Exception e) {
-            System.err.println("Ошибка при форматировании JSON: " + e.getMessage());
-            return json;
+            System.err.println("Ошибка при выполнении SQL запроса: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Тест не прошел", e);
         }
     }
 }
