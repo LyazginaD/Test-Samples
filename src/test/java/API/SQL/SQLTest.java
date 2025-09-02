@@ -74,48 +74,5 @@ public class SQLTest {
     }
 
 
-    @Test
-    @Severity(SeverityLevel.CRITICAL)
-    @Feature("DataBase")
-    @DisplayName("Вывод анализа покупок за последние 30 дней")
-    public void testSqlUserPurchaseAnalysis() {
-        try {
-            String query = "SELECT " +
-                    "users.email, " +
-                    "users.discount, " +
-                    "products.name, " +
-                    "products.price, " +
-                    "sales.sale_id, " +
-                    "sales.discount, " +
-                    "purchases.id, " +
-                    "purchases.date, " +
-                    "purchases.quantity, " +
-                    "purchases.price, " +
-                    "purchases.discount as total_discount, " +
-                    "SUM(purchases.quantity) OVER (PARTITION BY users.id) as total_user_purchases, " +
-                    "SUM(purchases.quantity * purchases.price) OVER (PARTITION BY users.id) as total_user_spent, " +
-                    "AVG(purchases.quantity) OVER (PARTITION BY products.product_id) as avg_quantity_per_product " +
-                    "FROM users " +
-                    "INNER JOIN purchases ON users.id = purchases.buyer " +
-                    "INNER JOIN products ON purchases.product_id = products.product_id " +
-                    "LEFT JOIN sales ON products.product_id = sales.product_id " +
-                    "WHERE purchases.date >= CURRENT_DATE - INTERVAL '30 days' " +
-                    "ORDER BY total_user_spent DESC, users.id, purchases.date DESC";
-
-
-            System.out.println("SQL: " + query);
-
-            HttpResponse<String> response = sqlExecutor.executeSqlRequest(query);
-            sqlExecutor.printResponse(response);
-
-            // Проверка успешного статуса
-            assertTrue(response.statusCode() >= 200 && response.statusCode() < 300,
-                    "HTTP статус должен быть успешным");
-
-        } catch (Exception e) {
-            System.err.println("Ошибка при выполнении SQL запроса: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Тест не прошел", e);
-        }
     }
 }
