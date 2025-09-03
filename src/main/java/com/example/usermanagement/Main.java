@@ -15,6 +15,7 @@ public class Main {
 
         System.out.println("=== Демонстрация работы шины событий с обработкой ошибок ===\n");
 
+        // Создаем шину и сервис
         EventBus eventBus = new EventBus();
 
         // Добавляем разные типы обработчиков
@@ -55,6 +56,7 @@ public class Main {
             }
         });
 
+        //Работа приложения
         UserService userService = new UserService(new InMemoryUserRepository(), eventBus);
 
         try {
