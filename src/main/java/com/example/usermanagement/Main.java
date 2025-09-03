@@ -1,29 +1,78 @@
 package com.example.usermanagement;
 
+import com.example.usermanagement.event.*;
 import com.example.usermanagement.model.User;
 import com.example.usermanagement.repository.impl.InMemoryUserRepository;
 import com.example.usermanagement.service.UserService;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Main {
     public static void main(String[] args) {
-        UserService userService = new UserService(new InMemoryUserRepository());
+        // Настраиваем подробное логирование для демонстрации
+        Logger.getLogger("com.example.usermanagement").setLevel(Level.ALL);
 
-        // Создаем пользователей
-        User user1 = userService.createUser("John Doe", "john@example.com");
-        User user2 = userService.createUser("Jane Smith", "jane@example.com");
+        System.out.println("=== Демонстрация работы шины событий с обработкой ошибок ===\n");
 
-        System.out.println("Created users:");
-        userService.getAllUsers().forEach(System.out::println);
+        EventBus eventBus = new EventBus();
 
-        // Обновляем email
-        User updatedUser = userService.updateUserEmail(user1.getId(), "john.new@example.com");
-        System.out.println("Updated user: " + updatedUser);
+        // Добавляем разные типы обработчиков
+        eventBus.subscribe(new EventListener() {
+            @Override
+            public void onEvent(UserEvent event) {
+                System.out.println("📋 Логгер: " + event.getType() + " - " + event.getUser().getName());
+            }
 
-        // Удаляем пользователя
-        boolean deleted = userService.deleteUser(user2.getId());
-        System.out.println("User deleted: " + deleted);
+            @Override
+            public String toString() {
+                return "ConsoleLogger";
+            }
+        });
 
-        System.out.println("Remaining users:");
-        userService.getAllUsers().forEach(System.out::println);
+        eventBus.subscribe(new EventListener() {
+            @Override
+            public void onEvent(UserEvent event) {
+                // Этот обработчик будет падать с ошибкой
+                throw new RuntimeException("Ошибка в обработчике уведомлений!");
+            }
+
+            @Override
+            public String toString() {
+                return "NotificationHandler";
+            }
+        });
+
+        eventBus.subscribe(new EventListener() {
+            @Override
+            public void onEvent(UserEvent event) {
+                System.out.println("✅ Аудитор: Зафиксировано событие " + event.getType());
+            }
+
+            @Override
+            public String toString() {
+                return "AuditTrail";
+            }
+        });
+
+        UserService userService = new UserService(new InMemoryUserRepository(), eventBus);
+
+        try {
+            System.out.println("Создаем пользователя...");
+            User user = userService.createUser("Иван Иванов", "ivan@example.com");
+
+            System.out.println("\nОбновляем email...");
+            userService.updateUserEmail(user.getId(), "ivan.new@example.com");
+
+            System.out.println("\nУдаляем пользователя...");
+            userService.deleteUser(user.getId());
+
+        } catch (Exception e) {
+            System.err.println("Критическая ошибка: " + e.getMessage());
+        }
+
+        System.out.println("\n=== Демонстрация завершена ===");
+        System.out.println("Обратите внимание, что ошибки в обработчиках были перехвачены");
+        System.out.println("и система продолжила работу нормально!");
     }
 }
