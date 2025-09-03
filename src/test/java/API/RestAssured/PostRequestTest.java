@@ -29,7 +29,7 @@ public class PostRequestTest {
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
-    @Feature("API")
+    @Feature("User data storage")
     @DisplayName("Тестирование тестового запроса Post c проверкой key/value по полям name, job")
     public void postRequestCheckResponseJsonBody() {
         UserDTO user = new UserDTO(TestData.NAME, TestData.INITIAL_JOB);

@@ -14,7 +14,7 @@ public class GetRequestTest {
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
-    @Feature("API")
+    @Feature("User data storage")
     @DisplayName("Тестирование запроса Get c проверкой status code = 200")
     public void getRequestCheckStatusCode() {
         RestAssured.given()
@@ -27,7 +27,7 @@ public class GetRequestTest {
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
-    @Feature("API")
+    @Feature("User data storage")
     @DisplayName("Тестирование запроса Get c проверкой key/value по полям id, email, first_name, last_name")
     public void getRequestCheckResponseJsonBody() {
         ValidatableResponse response = RestAssured.given()
@@ -46,7 +46,7 @@ public class GetRequestTest {
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
-    @Feature("API")
+    @Feature("User data storage")
     @DisplayName("Тестирование запроса Get c валидацией ответа по json схеме")
     public void getRequestCheckResponseWithJsonSchema() {
         RestAssured.given()

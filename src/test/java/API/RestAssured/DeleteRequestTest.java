@@ -14,7 +14,7 @@ public class DeleteRequestTest {
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
-    @Feature("API")
+    @Feature("User data storage")
     @DisplayName("Тестирование запроса Delete c удалением пользователя")
     public void deleteRequestCheckStatusCode() {
         // Создаем пользователя и получаем его ID

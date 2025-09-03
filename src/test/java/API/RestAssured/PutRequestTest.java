@@ -13,7 +13,7 @@ public class PutRequestTest {
 
     @Test
     @Severity(SeverityLevel.CRITICAL)
-    @Feature("API")
+    @Feature("User data storage")
     @DisplayName("Тестирование тестового запроса Put c обновлением данных Users по полю job")
     public void putRequestCheckStatusCodeAndJsonBody() {
         // 1. Создаем пользователя и получаем его ID
