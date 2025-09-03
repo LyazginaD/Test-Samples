@@ -4,6 +4,9 @@ import com.example.usermanagement.model.User;
 import com.example.usermanagement.repository.UserRepository;
 import com.example.usermanagement.service.UserService;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,7 +32,9 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
+    @Severity(SeverityLevel.CRITICAL)
     @Feature("Registration")
+    @DisplayName("Создать пользователя и проверить, что пользователь существует")
     void testCreateUser_Success() {
         // Arrange - подготавливаем тестовые данные: валидное имя и валидный email
         String testName = "John Doe";
@@ -44,7 +49,7 @@ class UserServiceTest {
         // Act
         User result = userService.createUser(testName, testEmail);
 
-        // Assert
+        // Assert - проверяем, что пользователь создан и его данные соответствуют тестовым
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals(testName, result.getName());
@@ -63,7 +68,9 @@ class UserServiceTest {
     }
 
     @Test
+    @Severity(SeverityLevel.CRITICAL)
     @Feature("User Service")
+    @DisplayName("Создать пользователя - неверное имя пользователя")
     void testCreateUser_InvalidName() {
         // Arrange - подготавливаем тестовые данные: пустое имя и валидный email
         String testName = "";
@@ -79,7 +86,9 @@ class UserServiceTest {
     }
 
     @Test
+    @Severity(SeverityLevel.CRITICAL)
     @Feature("User Service")
+    @DisplayName("Получить данные пользователя - пользователь существует")
     void testGetUserById_UserExists() {
         // Arrange - создаем тестового пользователя
         User user = new User(1L, "John Doe", "john@example.com");
@@ -100,25 +109,9 @@ class UserServiceTest {
     }
 
     @Test
+    @Severity(SeverityLevel.CRITICAL)
     @Feature("User Service")
-    void testGetUserById_UserNotExists() {
-        // Arrange - настраиваем mock репозитория чтобы он возвращал empty Optional
-        // при поиске несуществующего пользователя (ID 999L)
-        when(userRepository.findById(999L)).thenReturn(Optional.empty());
-
-        // Act - вызываем метод сервиса для поиска несуществующего пользователя
-        Optional<User> result = userService.getUserById(999L);
-
-        // Assert - проверяем, что пользователь действительно не найден
-        assertFalse(result.isPresent());
-
-        // Verify - убеждаемся, что метод findById был вызван ровно один раз
-        // с указанным идентификатором
-        verify(userRepository, times(1)).findById(999L);
-    }
-
-    @Test
-    @Feature("User Service")
+    @DisplayName("Получить данные всех пользователей - пользователи существуют")
     void testGetAllUsers() {
         // Arrange - создаем список тестовых пользователей
         List<User> users = Arrays.asList(
@@ -139,45 +132,29 @@ class UserServiceTest {
     }
 
     @Test
+    @Severity(SeverityLevel.CRITICAL)
     @Feature("User Service")
-    void testDeleteUser_UserExists() {
-        // Arrange - настраиваем mock репозитория: пользователь существует
-        // и метод deleteById не делает ничего (void метод)
-        when(userRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(userRepository).deleteById(1L);
+    @DisplayName("Получить данные пользователя - пользователь отсутствует")
+    void testGetUserById_UserNotExists() {
+        // Arrange - настраиваем mock репозитория чтобы он возвращал empty Optional
+        // при поиске несуществующего пользователя (ID 999L)
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act - вызываем метод сервиса для удаления существующего пользователя
-        boolean result = userService.deleteUser(1L);
+        // Act - вызываем метод сервиса для поиска несуществующего пользователя
+        Optional<User> result = userService.getUserById(999L);
 
-        // Assert - проверяем, что удаление прошло успешно
-        assertTrue(result);
+        // Assert - проверяем, что пользователь действительно не найден
+        assertFalse(result.isPresent());
 
-        // Verify - убеждаемся, что методы existsById и deleteById были вызваны
-        // по одному разу с правильными параметрами
-        verify(userRepository, times(1)).existsById(1L);
-        verify(userRepository, times(1)).deleteById(1L);
+        // Verify - убеждаемся, что метод findById был вызван ровно один раз
+        // с указанным идентификатором
+        verify(userRepository, times(1)).findById(999L);
     }
 
     @Test
+    @Severity(SeverityLevel.CRITICAL)
     @Feature("User Service")
-    void testDeleteUser_UserNotExists() {
-        // Arrange - настраиваем mock репозитория: пользователь не существует
-        when(userRepository.existsById(999L)).thenReturn(false);
-
-        // Act - вызываем метод сервиса для удаления несуществующего пользователя
-        boolean result = userService.deleteUser(999L);
-
-        // Assert - проверяем, что удаление не выполнено (возвращено false)
-        assertFalse(result);
-
-        // Verify - убеждаемся, что existsById был вызван, а deleteById - никогда
-        // это предотвращает попытки удаления несуществующих записей
-        verify(userRepository, times(1)).existsById(999L);
-        verify(userRepository, never()).deleteById(anyLong());
-    }
-
-    @Test
-    @Feature("User Service")
+    @DisplayName("Обновить пользователя - пользователь существует")
     void testUpdateUserEmail_Success() {
         // Arrange - создаем существующего пользователя и ожидаемого обновленного пользователя
         User existingUser = new User(1L, "John Doe", "old@example.com");
@@ -200,7 +177,9 @@ class UserServiceTest {
     }
 
     @Test
+    @Severity(SeverityLevel.CRITICAL)
     @Feature("User Service")
+    @DisplayName("Обновить пользователя - пользователь отсутствует")
     void testUpdateUserEmail_UserNotFound() {
         // Arrange - настраиваем mock репозитория: пользователь не найден
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
@@ -213,5 +192,47 @@ class UserServiceTest {
         // это предотвращает создание новых записей при ошибке обновления
         verify(userRepository, times(1)).findById(999L);
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    @Severity(SeverityLevel.CRITICAL)
+    @Feature("User Service")
+    @DisplayName("Удалить пользователя - пользователь существует")
+    void testDeleteUser_UserExists() {
+        // Arrange - настраиваем mock репозитория: пользователь существует
+        // и метод deleteById не делает ничего (void метод)
+        when(userRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(userRepository).deleteById(1L);
+
+        // Act - вызываем метод сервиса для удаления существующего пользователя
+        boolean result = userService.deleteUser(1L);
+
+        // Assert - проверяем, что удаление прошло успешно
+        assertTrue(result);
+
+        // Verify - убеждаемся, что методы existsById и deleteById были вызваны
+        // по одному разу с правильными параметрами
+        verify(userRepository, times(1)).existsById(1L);
+        verify(userRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @Severity(SeverityLevel.CRITICAL)
+    @Feature("User Service")
+    @DisplayName("Удалить пользователя - пользователь отсутствует")
+    void testDeleteUser_UserNotExists() {
+        // Arrange - настраиваем mock репозитория: пользователь не существует
+        when(userRepository.existsById(999L)).thenReturn(false);
+
+        // Act - вызываем метод сервиса для удаления несуществующего пользователя
+        boolean result = userService.deleteUser(999L);
+
+        // Assert - проверяем, что удаление не выполнено (возвращено false)
+        assertFalse(result);
+
+        // Verify - убеждаемся, что existsById был вызван, а deleteById - никогда
+        // это предотвращает попытки удаления несуществующих записей
+        verify(userRepository, times(1)).existsById(999L);
+        verify(userRepository, never()).deleteById(anyLong());
     }
 }
