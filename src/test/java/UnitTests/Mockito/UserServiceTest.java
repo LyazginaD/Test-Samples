@@ -1,4 +1,4 @@
-package API.Mockito;
+package UnitTests.Mockito;
 
 import com.example.usermanagement.event.EventBus;
 import com.example.usermanagement.model.User;
@@ -10,11 +10,13 @@ import io.qameta.allure.SeverityLevel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -187,6 +189,69 @@ class UserServiceTest {
         verify(userRepository, never()).deleteById(anyLong());
 
         // Verify - и событие не публиковалось
+        verify(eventBus, never()).publish(any());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"invalid", "no-at-sign", "missing@domain"})
+    @Severity(SeverityLevel.NORMAL)
+    @Feature("Validation")
+    @DisplayName("Создание пользователя с невалидным email")
+    void testCreateUser_InvalidEmail(String invalidEmail) {
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> userService.createUser("Valid Name", invalidEmail));
+
+        assertEquals("Invalid email format", exception.getMessage());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @Severity(SeverityLevel.NORMAL)
+    @Feature("Validation")
+    @DisplayName("Обновление email с невалидным адресом")
+    void testUpdateUserEmail_InvalidEmail() {
+        // Act & Assert - валидация должна происходить ДО поиска пользователя
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUserEmail(1L, "invalid-email"));
+
+        verify(userRepository, never()).findById(any());
+        verify(userRepository, never()).save(any());
+        verify(eventBus, never()).publish(any());
+    }
+
+    @Test
+    @Severity(SeverityLevel.NORMAL)
+    @Feature("Edge Cases")
+    @DisplayName("Обновление email на тот же самый email")
+    void testUpdateUserEmail_SameEmail() {
+        // Arrange
+        String sameEmail = "same@example.com";
+        User existingUser = new User(1L, "John Doe", sameEmail);
+        User updatedUser = new User(1L, "John Doe", sameEmail);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(any(User.class))).thenReturn(updatedUser);
+
+        // Act
+        User result = userService.updateUserEmail(1L, sameEmail);
+
+        // Assert
+        assertNotNull(result, "Результат не должен быть null");
+        assertEquals(sameEmail, result.getEmail());
+        verify(userRepository, times(1)).save(any());
+        verify(eventBus, times(1)).publish(any());
+    }
+
+    @Test
+    @Severity(SeverityLevel.MINOR)
+    @Feature("Edge Cases")
+    @DisplayName("Попытка удаления пользователя с null ID")
+    void testDeleteUser_NullId() {
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> userService.deleteUser(null));
+
+        verify(userRepository, never()).findById(any());
+        verify(userRepository, never()).deleteById(any());
         verify(eventBus, never()).publish(any());
     }
 }

@@ -1,4 +1,4 @@
-package API.Mockito;
+package UnitTests.Mockito;
 
 import com.example.usermanagement.event.EventBus;
 import com.example.usermanagement.event.EventListener;

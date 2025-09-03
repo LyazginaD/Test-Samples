@@ -22,8 +22,8 @@ public class UserService {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
-        if (email == null || !email.contains("@")) {
-            throw new IllegalArgumentException("Invalid email");
+        if (email == null || email.trim().isEmpty() || !isValidEmail(email)) {
+            throw new IllegalArgumentException("Invalid email format");
         }
 
         User user = new User(null, name, email);
@@ -38,6 +38,10 @@ public class UserService {
 
         return savedUser;
     }
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(emailRegex);
+    }
 
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
@@ -48,6 +52,9 @@ public class UserService {
     }
 
     public boolean deleteUser(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isPresent()) {
             userRepository.deleteById(id);
